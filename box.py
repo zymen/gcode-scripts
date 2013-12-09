@@ -21,7 +21,6 @@ def wall_bottom_iteration(start_x, start_y, start_z, width, height, depth):
 	print "G1 x%(start_x)d y" %d + str(start_y + height) +" z%(start_z)d" % d
 	print "G1 x%(start_x)d y%(start_y)d z%(start_z)d" % d
 
-
 def wall_bottom(start_x, start_y, start_z, width, height, depth, z_feed_rate):
 	iterations = (depth / z_feed_rate) + 1
 	print "(Preparing data for bottom wall)"
@@ -73,7 +72,6 @@ def tits_x(start_x, start_y, start_z, tits_number, direction):
 		tit(start_x + config.tit_size * 2 * tit_index, 
 		    start_y + m * config.tit_size, 
 		    start_z, direction)	
-
 	
 def wall_iteration(start_x, start_y, start_z, width, height, depth, per = 1):
 	d = {'start_x': start_x,
@@ -106,7 +104,6 @@ def wall_iteration(start_x, start_y, start_z, width, height, depth, per = 1):
 	print "(\t move into new place?)"
 	print "G1 x%(start_x)d y" %d + str(start_y + height) +" z%(start_z)d" % d
 	print "G1 x%(start_x)d y%(start_y)d z%(start_z)d" % d
-
 
 def wall(start_x, start_y, start_z, width, height, depth, z_feed_rate, per):
 	iterations = (depth / z_feed_rate) + 1
@@ -180,7 +177,6 @@ print "g1 f10000 z0"
 
 b = Box(x_size = 60, y_size = 36, z_size = 60)
 b.box()
-
 
 print "g0 z1"
 print "M2"
