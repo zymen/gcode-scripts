@@ -1,3 +1,5 @@
+import unittest
+
 from core import Element, ElementGcodeGenerator
 
 class Wall(Element):
@@ -40,3 +42,20 @@ class WallGcodeGenerator(ElementGcodeGenerator):
     output = output + "G1 x%(start_x_width)f y%(start_y_height)f\n" % wall_data
 
     return output
+
+class WallGcodeGenerator(unittest.TestCase):
+  project = None
+
+  def setUp(self):
+    from parts import Project
+
+    self.project = Project()
+    self.project.set_configuration(Configuration())
+    
+  def test_is_output_correct(self):
+    self.project.add_element(Wall(0, 0, 10, 10));
+    output = self.project.generate_gcode();
+    self.assertTrue("G1 x0.000000 y0.000000" in output)
+    self.assertTrue("G1 x10.000000 y0.000000" in output)
+    self.assertTrue("G1 x10.000000 y10.000000" in output)
+      
