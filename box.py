@@ -1,8 +1,7 @@
 from math import sqrt
 from read_image import main
+from core import Configuration
 
-class Configuration(object):
-	tit_size = 3
 
 config = Configuration()
 
