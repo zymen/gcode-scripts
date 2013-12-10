@@ -6,9 +6,11 @@ class Wall(Element):
   width = 0
   height = 0
 
+  @property
   def start_x_width(self):
     return self.start_x + self.width
 
+  @property
   def start_y_height(self):
     return self.start_y + self.height
 
