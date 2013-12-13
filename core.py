@@ -1,6 +1,13 @@
 
 class Configuration(object):
-	tit_size = 3
+  tit_size = 3
+
+class Tool(object):
+  cutter_diameter = 0 
+
+class Context(object):
+  config = None
+  tool = None
 
 class Element(object):
   def get_gcode_generator(self):
@@ -12,16 +19,17 @@ class ElementGcodeGenerator(object):
 
 class Project(object):
   elements = []
-  configuration = None
+  context = None
 
   def __init__(self):
     self.elements = []
+    self.context = Context()
 
   def add_element(self, element):
     self.elements.append(element)
 
   def set_configuration(self, configuration):
-    self.configuration = configuration
+    self.context.configuration = configuration
 
   def generate_gcode(self):
     output = ""
