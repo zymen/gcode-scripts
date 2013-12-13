@@ -33,7 +33,7 @@ class WallBuilder(object):
   @staticmethod
   def new_wall(project):
     builder = WallBuilder()
-    builder.wall = Wall(project, 0, 0, 0, 0)
+    builder.wall = Wall(project.context, 0, 0, 0, 0)
     return builder
 
   def build(self):
@@ -60,13 +60,14 @@ class WallGcodeGenerator(ElementGcodeGenerator):
     self.wall = wall
 
   def generate_gcode(self):
-    wall_data = self.wall.__dict__
-    wall_data['start_x_width'] = self.wall.start_x_width
-    wall_data['start_y_height'] = self.wall.start_y_height
+    half_tool = self.context.tool.cutter_diameter / 2
+    wall = self.wall
 
     output = ""
-    output = output + "G1 x%(start_x)f y%(start_y)f\n" % wall_data
-    output = output + "G1 x%(start_x_width)f y%(start_y)f\n" % wall_data
-    output = output + "G1 x%(start_x_width)f y%(start_y_height)f\n" % wall_data
+    output = output + "G1 x%f y%f\n" % (wall.start_x - half_tool, wall.start_y - half_tool)
+    output = output + "G1 x%f y%f\n" % (wall.start_x - half_tool, wall.start_y_height + half_tool)
+    output = output + "G1 x%f y%f\n" % (wall.start_x_width + half_tool, wall.start_y_height + half_tool)
+    output = output + "G1 x%f y%f\n" % (wall.start_x_width + half_tool, wall.start_y - half_tool)
+    output = output + "G1 x%f y%f\n" % (wall.start_x - half_tool, wall.start_y - half_tool)
 
     return output

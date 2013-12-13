@@ -5,9 +5,15 @@ class Configuration(object):
 class Tool(object):
   cutter_diameter = 0 
 
+  def __init__(self, cutter_diameter = 0):
+    self.cutter_diameter = cutter_diameter
+
 class Context(object):
   config = None
   tool = None
+
+  def __init__(self, tool = Tool()):
+    self.tool = tool
 
 class Element(object):
   def get_gcode_generator(self):
@@ -30,6 +36,9 @@ class Project(object):
 
   def set_configuration(self, configuration):
     self.context.configuration = configuration
+
+  def set_tool(self, tool):
+    self.context.tool = tool
 
   def generate_gcode(self):
     output = ""
