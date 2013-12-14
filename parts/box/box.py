@@ -43,6 +43,8 @@ class BoxBuilder(object):
     for index in range(0, 4):
       wall = WallBuilder \
                 .new_wall(self.project) \
+                .start_at(index * 100, 50) \
+                .with_size(90, 40) \
                 .build()
 
       self.box.walls.append(wall)
@@ -71,6 +73,7 @@ class BoxGcodeGenerator(ElementGcodeGenerator):
     self.box = box
 
   def generate_gcode(self):
+    output = ""
 
     for wall_index in range(0, len(self.box.walls)):
       wall = self.box.walls[wall_index]

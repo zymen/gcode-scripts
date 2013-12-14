@@ -40,12 +40,25 @@ class Project(object):
   def set_tool(self, tool):
     self.context.tool = tool
 
+  def gcode_prepare_header(self):
+    output = "%\n"
+    output = output + "G1 F1000 (set speed)\n"
+    output = output + "G21 (in milimeters)\n"
+    return output
+
+  def gcode_prepare_footer(self):
+    output = "G0 Z%f (get out of material)\n" % 3
+    output = output + "G0 X%f Y%f (go home)\n" % (0.0, 0.0)
+    output = output + "%"
+    return output
+
   def generate_gcode(self):
-    output = ""
+    output = self.gcode_prepare_header()
 
     for element in self.elements:
       gcode_generator = element.get_gcode_generator()
       output = output + gcode_generator.generate_gcode()
 
+    output = output + self.gcode_prepare_footer()
     return output
     
