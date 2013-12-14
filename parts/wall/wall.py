@@ -8,6 +8,7 @@ class Wall(Element):
   start_y = 0
   width = 0
   height = 0
+  wooden_joints = {}
 
   @property
   def start_x_width(self):
@@ -26,6 +27,7 @@ class Wall(Element):
     self.start_y = start_y
     self.width = width
     self.height = height
+    self.wooden_joints = {}
 
 class WallBuilder(object):
   wall = None
@@ -39,6 +41,23 @@ class WallBuilder(object):
   def build(self):
     return self.wall
 
+  def with_wooden_joints(self, on_left = True, on_right = True, on_top = False, on_bottom = False):
+    self.wall.wooden_joints = {}
+
+    if on_left:
+      self.wall.wooden_joints['left'] = True
+
+    if on_right:
+      self.wall.wooden_joints['right'] = True
+
+    if on_top:
+      self.wall.wooden_joints['top'] = True
+
+    if on_bottom:
+      self.wall.wooden_joints['bottom'] = True
+
+    return self
+    
   def start_at(self, x, y):
     self.wall.start_x = x
     self.wall.start_y = y
@@ -62,12 +81,43 @@ class WallGcodeGenerator(ElementGcodeGenerator):
   def generate_gcode(self):
     half_tool = self.context.tool.cutter_diameter / 2
     wall = self.wall
+    tit_size = 5
+
+    offset_in_height = 0
+
+    if wall.wooden_joints.has_key('top'):
+      offset_in_height = offset_in_height + tit_size
+
+    if wall.wooden_joints.has_key('bottom'):
+      offset_in_height = offset_in_height + tit_size
 
     output = ""
-    output = output + "G1 x%f y%f\n" % (wall.start_x - half_tool, wall.start_y - half_tool)
-    output = output + "G1 x%f y%f\n" % (wall.start_x - half_tool, wall.start_y_height + half_tool)
-    output = output + "G1 x%f y%f\n" % (wall.start_x_width + half_tool, wall.start_y_height + half_tool)
-    output = output + "G1 x%f y%f\n" % (wall.start_x_width + half_tool, wall.start_y - half_tool)
+    output = output + "(wall left bottom)\n"
+    output = output + "G1 x%f y%f\n" % (wall.start_x - half_tool, wall.start_y - half_tool + offset_in_height)
+
+    output = output + "(wall left top)\n"
+    output = output + "G1 x%f y%f\n" % (wall.start_x - half_tool, wall.start_y_height + half_tool + offset_in_height)
+
+    output = output + "(wall right top)\n"
+    output = output + "G1 x%f y%f\n" % (wall.start_x_width + half_tool, wall.start_y_height + half_tool + offset_in_height)
+
+    output = output + "(wall right bottom)\n"
+    output = output + "G1 x%f y%f\n" % (wall.start_x_width + half_tool, wall.start_y - half_tool + offset_in_height)
+
+    if wall.wooden_joints.has_key('bottom'):
+      steps = wall.width / tit_size
+
+      for step_index in range(0, steps):
+        if step_index % 2 == 0:
+          output = output + "G1 x%f y%f\n" % (wall.start_x_width + half_tool - step_index * tit_size, wall.start_y - half_tool + offset_in_height)
+          output = output + "G1 x%f y%f\n" % (wall.start_x_width + half_tool - (step_index +1)* tit_size, wall.start_y - half_tool + offset_in_height)
+          #output = output + "G1 x%f y%f\n" % (wall.start_x_width + half_tool - (step_index + 1) * tit_size, wall.start_y - half_tool)
+        else:
+          output = output + "G1 x%f y%f\n" % (wall.start_x_width + half_tool - step_index * tit_size, wall.start_y - half_tool)
+          output = output + "G1 x%f y%f\n" % (wall.start_x_width + half_tool - (step_index +1)* tit_size, wall.start_y - half_tool)
+        #output = output + "G1 x%f y%f\n" % (wall.start_x_width + half_tool - step_index * tit_size, wall.start_y - half_tool)
+
+    output = output + "(wall left bottom)\n"
     output = output + "G1 x%f y%f\n" % (wall.start_x - half_tool, wall.start_y - half_tool)
 
     return output

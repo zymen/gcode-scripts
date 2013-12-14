@@ -48,3 +48,34 @@ class WallGcodeGeneratorToolUsageTest(unittest.TestCase):
     self.assertTrue("G1 x12.000000 y12.000000" in output)
       
 
+class WallGcodeGeneratorWithWoodenJointsTest(unittest.TestCase):
+  project = None
+
+  def setUp(self):
+    self.project = Project()
+    self.project.set_configuration(Configuration())
+    self.project.set_tool(Tool(cutter_diameter = 0))
+    
+  def test_is_output_correct(self):
+    wall = WallBuilder \
+            .new_wall(self.project) \
+            .start_at(0, 0) \
+            .with_size(30, 10) \
+            .with_wooden_joints(on_bottom = True) \
+            .build()
+
+    self.project.add_element(wall);
+    output = self.project.generate_gcode();
+
+    #print output
+
+    self.assertTrue("G1 x0.000000 y5.000000" in output)
+    self.assertTrue("G1 x0.000000 y15.000000" in output)
+    self.assertTrue("G1 x30.000000 y15.000000" in output)
+    self.assertTrue("G1 x30.000000 y5.000000" in output)
+      
+    self.assertTrue("G1 x25.000000 y5.000000" in output)
+    self.assertTrue("G1 x25.000000 y0.000000" in output)
+    self.assertTrue("G1 x20.000000 y0.000000" in output)
+    self.assertTrue("G1 x20.000000 y5.000000" in output)
+

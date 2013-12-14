@@ -10,6 +10,7 @@ def main():
           .new_box(project) \
           .start_at(0, 0) \
           .with_size(40, 60, 80) \
+          .with_wooden_joints() \
           .build()
 
   project.add_element(box);

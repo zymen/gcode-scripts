@@ -10,6 +10,7 @@ class Box(Element):
   width = 0
   height = 0
   depth = 0
+  wooden_joints = False
   walls = []
 
   @property
@@ -26,6 +27,7 @@ class Box(Element):
   def __init__(self, context):
     self.context = context
     self.walls = []
+    self.wooden_joints = False
 
 class BoxBuilder(object):
   box = None
@@ -38,12 +40,17 @@ class BoxBuilder(object):
     builder.project = project
     return builder
 
+  def with_wooden_joints(self):
+    self.box.wooden_joints = True
+    return self
+    
   def build(self):
 
     for index in range(0, 4):
       wall = WallBuilder \
                 .new_wall(self.project) \
                 .start_at(index * 100, 50) \
+                .with_wooden_joints(on_left = True, on_right = True, on_top = False, on_bottom = True) \
                 .with_size(90, 40) \
                 .build()
 

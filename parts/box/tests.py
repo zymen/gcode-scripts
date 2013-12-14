@@ -17,8 +17,23 @@ class BoxTest(unittest.TestCase):
             .with_size(40, 60, 80) \
             .build()
 
-    self.project.add_element(box);
     self.assertEquals(4, len(box.walls))
+
+class BoxWithWoodenJointsTest(unittest.TestCase):
+  project = None
+
+  def setUp(self):
+    self.project = Project()
+    self.project.set_configuration(Configuration())
+    box = BoxBuilder \
+            .new_box(self.project) \
+            .start_at(0, 0) \
+            .with_size(40, 60, 80) \
+            .with_wooden_joints() \
+            .build()
+    
+  def test_has_this_box_4_walls(self):
+    pass
 
 class BoxGcodeGeneratorSimpleTest(unittest.TestCase):
   project = None
