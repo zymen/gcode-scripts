@@ -1,5 +1,7 @@
 import unittest
 
+from gcode_parser.tests import *
+
 from parts.wall.tests import *
 from parts.box.tests import *
 
