@@ -1,5 +1,6 @@
 import unittest
 
+from gcode_parser.parser import GcodeParser
 from core import Project, Element, Configuration, ElementGcodeGenerator, Tool
 from parts.wall.wall import WallBuilder
 
@@ -17,8 +18,11 @@ class WallGcodeGeneratorSimpleTest(unittest.TestCase):
             .with_size(10, 10) \
             .build()
 
-    self.project.add_element(wall);
-    output = self.project.generate_gcode();
+    gcode_generator = wall.get_gcode_generator()
+    output = gcode_generator.generate_gcode()
+
+    parser = GcodeParser(output)
+    cmd = parser.next_code()
 
     self.assertTrue("G1 x0.000000 y0.000000" in output)
     self.assertTrue("G1 x10.000000 y0.000000" in output)

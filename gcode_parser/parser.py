@@ -9,7 +9,7 @@ class GcodeParser(object):
   def _prepare_gcode_command(self, command_raw):
     code = command_raw.split(" ")
     if code[0].upper() == 'G1':
-      return GcodeG1Command(command_raw)
+      return GcodeG1Command(gcode_command = command_raw)
 
     return GcodeCommand(command_raw)
 
@@ -42,9 +42,13 @@ class GcodeCommand(object):
   def get_code(self):
     return self.code
 
-  def __init__(self, gcode_command):
-    parts = gcode_command.split(" ")
-    self.code = parts[0]
+  def __init__(self, gcode_command = None, code = None):
+    if code != None:
+      self.code = code
+
+    if gcode_command != None:
+      parts = gcode_command.split(" ")
+      self.code = parts[0]
 
 class GcodeG1Command(GcodeCommand):
   x = None
@@ -60,16 +64,22 @@ class GcodeG1Command(GcodeCommand):
   def get_z(self):
     return self.z
 
-  def __init__(self, gcode_command):
-    super(GcodeG1Command, self).__init__(gcode_command)
-    parts = gcode_command.split(" ")
+  def __init__(self, gcode_command = None, gcode = None, x = None, y = None, z = None):
+    if gcode_command != None:
+      super(GcodeG1Command, self).__init__(gcode_command)
+      parts = gcode_command.split(" ")
 
-    for param in parts:
-      if param[0].lower() == 'x':
-        self.x = float(param[1:])
+      for param in parts:
+        if param[0].lower() == 'x':
+          self.x = float(param[1:])
 
-      if param[0].lower() == 'y':
-        self.y = float(param[1:])
+        if param[0].lower() == 'y':
+          self.y = float(param[1:])
 
-      if param[0].lower() == 'z':
-        self.z = float(param[1:])
+        if param[0].lower() == 'z':
+          self.z = float(param[1:])
+    else:
+      self.code = "G1"
+      self.x = x
+      self.y = y
+      self.z = z

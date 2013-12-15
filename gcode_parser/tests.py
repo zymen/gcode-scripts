@@ -1,8 +1,18 @@
 import unittest
 
-from parser import GcodeParser, GcodeCommand
+from parser import GcodeParser, GcodeCommand, GcodeG1Command
 
-class GcodeParserSimpleUsageTests(unittest.TestCase):
+class GcodeParserBaseTests(unittest.TestCase):
+  def assertAreEqualGcodes(self, code1, code2):
+    self.assertTrue(isinstance(code1, GcodeCommand)) 
+    self.assertTrue(isinstance(code2, GcodeCommand)) 
+
+    self.assertEquals(code1.get_code(), code2.get_code())
+    self.assertEquals(code1.get_x(), code2.get_x())
+    self.assertEquals(code1.get_y(), code2.get_y())
+    self.assertEquals(code1.get_z(), code2.get_z())
+
+class GcodeParserSimpleUsageTests(GcodeParserBaseTests):
   def test_does_it_correctly_counts_number_of_lines(self):
     gcode = """
     G1 F1000
@@ -24,9 +34,5 @@ class GcodeParserSimpleUsageTests(unittest.TestCase):
     self.assertTrue(isinstance(code, GcodeCommand)) 
 
     code = parser.next_code()
-    self.assertTrue(isinstance(code, GcodeCommand)) 
-    self.assertEquals("G1", code.get_code())
-    self.assertEquals(-3, code.get_x())
-    self.assertEquals(0.0001, code.get_y())
-    self.assertEquals(2, code.get_z())
+    self.assertAreEqualGcodes(code, GcodeG1Command(x = -3, y = 0.0001, z = 2))
 
