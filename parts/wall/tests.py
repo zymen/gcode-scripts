@@ -1,6 +1,7 @@
 import unittest
 
-from gcode_parser.parser import GcodeParser
+from gcode_parser.parser import GcodeParser, GcodeG1Command
+from gcode_parser.tests import GcodeParserBaseTests
 from core import Project, Element, Configuration, ElementGcodeGenerator, Tool
 from parts.wall.wall import WallBuilder
 
@@ -52,7 +53,7 @@ class WallGcodeGeneratorToolUsageTest(unittest.TestCase):
     self.assertTrue("G1 x12.000000 y12.000000" in output)
       
 
-class WallGcodeGeneratorWithWoodenJointsTest(unittest.TestCase):
+class WallGcodeGeneratorWithWoodenJointsTest(GcodeParserBaseTests):
   project = None
 
   def setUp(self):
@@ -73,7 +74,12 @@ class WallGcodeGeneratorWithWoodenJointsTest(unittest.TestCase):
 
     #print output
 
-    self.assertTrue("G1 x0.000000 y5.000000" in output)
+    parser = GcodeParser(output)
+    code = parser.find(GcodeG1Command(x = 0, y = 5))
+
+    self.assertTrue(code != None)
+
+    self.assertAreEqualGcodes(GcodeG1Command(x = 0, y = 5), code)
     self.assertTrue("G1 x0.000000 y15.000000" in output)
     self.assertTrue("G1 x30.000000 y15.000000" in output)
     self.assertTrue("G1 x30.000000 y5.000000" in output)

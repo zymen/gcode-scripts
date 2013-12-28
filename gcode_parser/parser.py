@@ -26,6 +26,14 @@ class GcodeParser(object):
     self._gcode_pointer = self._gcode_pointer + 1
 
     return command
+
+  def find(self, searched_command):
+    for index in range(0, len(self.gcode)):
+      entry = self._prepare_gcode_command(self.gcode[index])
+      if entry == searched_command:
+        return entry
+
+    return None
     
   def __init__(self, gcode):
     self.gcode = []
@@ -49,6 +57,12 @@ class GcodeCommand(object):
     if gcode_command != None:
       parts = gcode_command.split(" ")
       self.code = parts[0]
+
+  def __eq__(self, other):
+    if not isinstance(other, GcodeCommand):
+      return False
+
+    return self.code == other.code
 
 class GcodeG1Command(GcodeCommand):
   x = None
@@ -83,3 +97,9 @@ class GcodeG1Command(GcodeCommand):
       self.x = x
       self.y = y
       self.z = z
+
+  def __eq__(self, other):
+    if not isinstance(other, GcodeG1Command):
+      return False
+
+    return super(GcodeG1Command, self).__eq__(other) and self.x == other.x and self.y == other.y and self.z == other.z
