@@ -66,7 +66,7 @@ class WallGcodeGeneratorWithWoodenJointsTest(GcodeParserBaseTests):
     self.project.set_configuration(Configuration())
     self.project.set_tool(Tool(cutter_diameter = 0))
     
-  def test_is_output_correct(self):
+  def test_is_output_for_bottom_side_correct(self):
     wall = WallBuilder \
             .new_wall(self.project) \
             .start_at(0, 0) \
@@ -74,21 +74,31 @@ class WallGcodeGeneratorWithWoodenJointsTest(GcodeParserBaseTests):
             .with_wooden_joints(on_bottom = True) \
             .build()
 
-    self.project.add_element(wall);
-    output = self.project.generate_gcode();
+    gcode_generator = wall.get_gcode_generator()
+    output = gcode_generator.generate_gcode()
 
     parser = GcodeParser(output)
-    code = parser.find(GcodeG1Command(x = 0, y = 5))
 
-    self.assertTrue(code != None)
-
-    self.assertAreEqualGcodes(GcodeG1Command(x = 0, y = 5), code)
+    self.assertAreEqualGcodes(GcodeG1Command(x = 0, y = 5), parser.next_code())
     self.assertAreEqualGcodes(GcodeG1Command(x = 0, y = 15), parser.next_code())
     self.assertAreEqualGcodes(GcodeG1Command(x = 30, y = 15), parser.next_code())
     self.assertAreEqualGcodes(GcodeG1Command(x = 30, y = 5), parser.next_code())
-      
-    self.assertTrue("G1 x25.000000 y5.000000" in output)
-    self.assertTrue("G1 x25.000000 y0.000000" in output)
-    self.assertTrue("G1 x20.000000 y0.000000" in output)
-    self.assertTrue("G1 x20.000000 y5.000000" in output)
 
+    # now bottom side
+    #first tit
+    self.assertAreEqualGcodes(GcodeG1Command(x = 30, y = 0), parser.next_code())
+    self.assertAreEqualGcodes(GcodeG1Command(x = 25, y = 0), parser.next_code())
+    self.assertAreEqualGcodes(GcodeG1Command(x = 25, y = 5), parser.next_code())
+    self.assertAreEqualGcodes(GcodeG1Command(x = 20, y = 5), parser.next_code())
+
+    #second tit
+    self.assertAreEqualGcodes(GcodeG1Command(x = 20, y = 0), parser.next_code())
+    self.assertAreEqualGcodes(GcodeG1Command(x = 15, y = 0), parser.next_code())
+    self.assertAreEqualGcodes(GcodeG1Command(x = 15, y = 5), parser.next_code())
+    self.assertAreEqualGcodes(GcodeG1Command(x = 10, y = 5), parser.next_code())
+
+    #second tit
+    self.assertAreEqualGcodes(GcodeG1Command(x = 10, y = 0), parser.next_code())
+    self.assertAreEqualGcodes(GcodeG1Command(x = 5, y = 0), parser.next_code())
+    self.assertAreEqualGcodes(GcodeG1Command(x = 5, y = 5), parser.next_code())
+    self.assertAreEqualGcodes(GcodeG1Command(x = 0, y = 5), parser.next_code())
