@@ -1,6 +1,6 @@
 import unittest
 
-from parser import GcodeParser, GcodeCommand, GcodeG1Command
+from parser import GcodeParser, GcodeCommand, GcodeG1Command, GcodeCommentCommand
 
 class GcodeParserBaseTests(unittest.TestCase):
   def assertAreEqualGcodes(self, code1, code2):
@@ -34,5 +34,27 @@ class GcodeParserSimpleUsageTests(GcodeParserBaseTests):
     self.assertTrue(isinstance(code, GcodeCommand)) 
 
     code = parser.next_code()
+    self.assertAreEqualGcodes(code, GcodeG1Command(x = -3, y = 0.0001, z = 2))
+
+  def test_checking_movement_with_comments_inside_gcode(self):
+    gcode = """
+    (test)
+    G1 F1000
+    (test 2)
+    G1 Z2.000 X-3 Y0.0001
+    """
+
+    parser = GcodeParser(gcode)
+
+    code = parser.next_code(ignore_comments = False)
+    self.assertTrue(isinstance(code, GcodeCommentCommand)) 
+
+    code = parser.next_code(ignore_comments = False)
+    self.assertTrue(isinstance(code, GcodeG1Command))     
+
+    code = parser.next_code(ignore_comments = False)
+    self.assertTrue(isinstance(code, GcodeCommentCommand)) 
+
+    code = parser.next_code(ignore_comments = False)
     self.assertAreEqualGcodes(code, GcodeG1Command(x = -3, y = 0.0001, z = 2))
 

@@ -7,23 +7,32 @@ class GcodeParser(object):
     return len(self.gcode)
 
   def _prepare_gcode_command(self, command_raw):
+    if command_raw[0] == '(':
+      return GcodeCommentCommand()
+
     code = command_raw.split(" ")
+
     if code[0].upper() == 'G1':
       return GcodeG1Command(gcode_command = command_raw)
 
     return GcodeCommand(command_raw)
 
-  def next_code(self):
+  def next_code(self, ignore_comments = True):
     command = None
 
-    if not self._gcode_objects.has_key(self._gcode_pointer):
-       command_raw = self.gcode[self._gcode_pointer]
-       command = self._prepare_gcode_command(command_raw)
-       self._gcode_objects[self._gcode_pointer] = command
-    else:
-       command = self._gcode_objects[self._gcode_pointer]
+    while self._gcode_pointer < len(self.gcode) and command == None:
+      if not self._gcode_objects.has_key(self._gcode_pointer):
+         command_raw = self.gcode[self._gcode_pointer]
+         command = self._prepare_gcode_command(command_raw)
+         self._gcode_objects[self._gcode_pointer] = command
+      else:
+         command = self._gcode_objects[self._gcode_pointer]
 
-    self._gcode_pointer = self._gcode_pointer + 1
+      self._gcode_pointer = self._gcode_pointer + 1
+
+      if command.code == 'COMMENT' and ignore_comments:
+        command = None
+        continue
 
     return command
 
@@ -31,6 +40,7 @@ class GcodeParser(object):
     for index in range(0, len(self.gcode)):
       entry = self._prepare_gcode_command(self.gcode[index])
       if entry == searched_command:
+        self._gcode_pointer = index + 1
         return entry
 
     return None
@@ -63,6 +73,11 @@ class GcodeCommand(object):
       return False
 
     return self.code == other.code
+
+
+class GcodeCommentCommand(GcodeCommand):
+  def __init__(self):
+    self.code = 'COMMENT'
 
 class GcodeG1Command(GcodeCommand):
   x = None

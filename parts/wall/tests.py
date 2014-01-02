@@ -5,7 +5,7 @@ from gcode_parser.tests import GcodeParserBaseTests
 from core import Project, Element, Configuration, ElementGcodeGenerator, Tool
 from parts.wall.wall import WallBuilder
 
-class WallGcodeGeneratorSimpleTest(unittest.TestCase):
+class WallGcodeGeneratorSimpleTest(GcodeParserBaseTests):
   project = None
 
   def setUp(self):
@@ -23,14 +23,15 @@ class WallGcodeGeneratorSimpleTest(unittest.TestCase):
     output = gcode_generator.generate_gcode()
 
     parser = GcodeParser(output)
-    cmd = parser.next_code()
+    code = parser.next_code()
 
-    self.assertTrue("G1 x0.000000 y0.000000" in output)
-    self.assertTrue("G1 x10.000000 y0.000000" in output)
-    self.assertTrue("G1 x10.000000 y10.000000" in output)
-      
+    self.assertAreEqualGcodes(GcodeG1Command(x = 0, y = 0), code)
+    self.assertAreEqualGcodes(GcodeG1Command(x = 0, y = 10), parser.next_code())
+    self.assertAreEqualGcodes(GcodeG1Command(x = 10, y = 10), parser.next_code())
+    self.assertAreEqualGcodes(GcodeG1Command(x = 10, y = 0), parser.next_code())
+    self.assertAreEqualGcodes(GcodeG1Command(x = 0, y = 0), parser.next_code())
 
-class WallGcodeGeneratorToolUsageTest(unittest.TestCase):
+class WallGcodeGeneratorToolUsageTest(GcodeParserBaseTests):
   project = None
 
   def setUp(self):
@@ -45,13 +46,17 @@ class WallGcodeGeneratorToolUsageTest(unittest.TestCase):
             .with_size(10, 10) \
             .build()
 
-    self.project.add_element(wall);
-    output = self.project.generate_gcode();
+    gcode_generator = wall.get_gcode_generator()
+    output = gcode_generator.generate_gcode()
 
-    self.assertTrue("G1 x-2.000000 y-2.000000" in output)
-    self.assertTrue("G1 x12.000000 y-2.000000" in output)
-    self.assertTrue("G1 x12.000000 y12.000000" in output)
-      
+    parser = GcodeParser(output)
+    code = parser.next_code()
+
+    self.assertAreEqualGcodes(GcodeG1Command(x = -2, y = -2), code)
+    self.assertAreEqualGcodes(GcodeG1Command(x = -2, y = 12), parser.next_code())
+    self.assertAreEqualGcodes(GcodeG1Command(x = 12, y = 12), parser.next_code())
+    self.assertAreEqualGcodes(GcodeG1Command(x = 12, y = -2), parser.next_code())
+    self.assertAreEqualGcodes(GcodeG1Command(x = -2, y = -2), parser.next_code())
 
 class WallGcodeGeneratorWithWoodenJointsTest(GcodeParserBaseTests):
   project = None
@@ -72,17 +77,15 @@ class WallGcodeGeneratorWithWoodenJointsTest(GcodeParserBaseTests):
     self.project.add_element(wall);
     output = self.project.generate_gcode();
 
-    #print output
-
     parser = GcodeParser(output)
     code = parser.find(GcodeG1Command(x = 0, y = 5))
 
     self.assertTrue(code != None)
 
     self.assertAreEqualGcodes(GcodeG1Command(x = 0, y = 5), code)
-    self.assertTrue("G1 x0.000000 y15.000000" in output)
-    self.assertTrue("G1 x30.000000 y15.000000" in output)
-    self.assertTrue("G1 x30.000000 y5.000000" in output)
+    self.assertAreEqualGcodes(GcodeG1Command(x = 0, y = 15), parser.next_code())
+    self.assertAreEqualGcodes(GcodeG1Command(x = 30, y = 15), parser.next_code())
+    self.assertAreEqualGcodes(GcodeG1Command(x = 30, y = 5), parser.next_code())
       
     self.assertTrue("G1 x25.000000 y5.000000" in output)
     self.assertTrue("G1 x25.000000 y0.000000" in output)
