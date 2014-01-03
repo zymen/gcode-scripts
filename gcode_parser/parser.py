@@ -2,6 +2,7 @@ class GcodeParser(object):
   gcode = None
   _gcode_objects = {}
   _gcode_pointer = 0
+  _current_command = None
 
   def get_lines_number(self):
     return len(self.gcode)
@@ -21,12 +22,7 @@ class GcodeParser(object):
     command = None
 
     while self._gcode_pointer < len(self.gcode) and command == None:
-      if not self._gcode_objects.has_key(self._gcode_pointer):
-         command_raw = self.gcode[self._gcode_pointer]
-         command = self._prepare_gcode_command(command_raw)
-         self._gcode_objects[self._gcode_pointer] = command
-      else:
-         command = self._gcode_objects[self._gcode_pointer]
+      command = self._get_code_on_current_position()
 
       self._gcode_pointer = self._gcode_pointer + 1
 
@@ -34,23 +30,39 @@ class GcodeParser(object):
         command = None
         continue
 
+      if command != None and command == self._current_command:
+        command = None
+        continue
+
+    self._current_command = command
     return command
 
-  def _get_code_on_position(self, position, ignore_comments = True):
-    command = None
+  def _get_code_on_current_position(self):
+    return self._get_code_on_position(self._gcode_pointer)
 
-    saved_gcode_pointer = self._gcode_pointer
-    self._gcode_pointer = position
-
-    command = self.next_code(ignore_comments = ignore_comments)
-
-    self._gcode_pointer = saved_gcode_pointer
+  def _get_code_on_position(self, position):
+    if not self._gcode_objects.has_key(position):
+       command_raw = self.gcode[position]
+       command = self._prepare_gcode_command(command_raw)
+       self._gcode_objects[position] = command
+    else:
+       command = self._gcode_objects[position]
 
     return command
 
   def get_first_code(self, ignore_comments = True):
     position = 0
-    return self._get_code_on_position(position)
+    command = None
+
+    while command == None:
+      command = self._get_code_on_position(position)
+      position = position + 1
+
+      if ignore_comments and command.code == 'COMMENT':
+        command = None
+        continue
+
+    return command
 
   def get_last_code(self, ignore_comments = True):
     position = len(self.gcode) - 1

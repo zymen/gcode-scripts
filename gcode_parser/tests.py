@@ -151,3 +151,24 @@ class GcodeParserSimpleUsageTests(GcodeParserBaseTests):
     code = parser.next_code()
     self.assertTrue(isinstance(code, GcodeG1Command)) 
     self.assertAreEqualGcodes(GcodeG1Command(z = 2, x = -3, y = 0.0001), code)
+
+  def test_access_for_next_code_should_ommit_duplicated_lines(self):
+    gcode = """
+    (test)
+    G1 X0 Y0
+    G1 X0 Y0
+    (test 2)
+    G1 Z15
+    G1 Z2.000 X-3 Y0.0001
+    G1 X1 Y0
+    """
+
+    parser = GcodeParser(gcode)
+
+    code = parser.next_code()
+    self.assertTrue(isinstance(code, GcodeG1Command)) 
+    self.assertAreEqualGcodes(GcodeG1Command(x = 0, y = 0), code)
+
+    code = parser.next_code()
+    self.assertTrue(isinstance(code, GcodeG1Command)) 
+    self.assertAreEqualGcodes(GcodeG1Command(z = 15), code)

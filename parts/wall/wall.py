@@ -125,6 +125,73 @@ class WallGcodeGenerator(ElementGcodeGenerator):
 
     return output
 
+  def _generate_gcode_for_right_side(self, offset_in_width, offset_in_height, half_tool, tit_size):
+    wall = self.wall
+    output = ""
+    output = output + "(#{'type': 'wall-part', 'location': ['right', 'top']})\n"
+
+    if wall.wooden_joints.has_key('right'):
+      #output = output + "G1 x%f y%f\n" % (wall.start_x + offset_in_width, wall.start_y - half_tool + offset_in_height)
+
+      steps = wall.height / tit_size
+      last_x = 0
+      last_y = 0
+
+      for step_index in range(steps, 0, -1):
+        if step_index % 2 == 0:
+          #horizontal
+          last_x = wall.start_x_width - half_tool + tit_size
+          last_y = wall.start_y - half_tool + (step_index + 0) * tit_size + offset_in_height
+          output = output + "G1 x%f y%f\n" % (last_x, last_y)
+
+          last_x = wall.start_x_width - half_tool + tit_size
+          last_y = wall.start_y + half_tool + (step_index - 1) * tit_size + offset_in_height
+          output = output + "G1 x%f y%f\n" % (last_x, last_y)
+        else:
+          #vertical
+          last_x = wall.start_x_width - half_tool
+          last_y = wall.start_y + half_tool + (step_index + 0)* tit_size + offset_in_height
+          output = output + "G1 x%f y%f\n" % (last_x, last_y)
+
+          last_x = wall.start_x_width - half_tool
+          last_y = wall.start_y - half_tool + (step_index - 1) * tit_size + offset_in_height
+          output = output + "G1 x%f y%f\n" % (last_x, last_y)
+
+      proposed_x = wall.start_x_width - half_tool + tit_size
+      proposed_y = wall.start_y_height + half_tool + offset_in_height
+
+      if last_x != proposed_x or last_y != proposed_y:
+        output = output + "(wall right top)\n"
+        #output = output + "G1 x%f y%f\n" % (proposed_x, proposed_y)
+
+    else:
+      output = output + "(wall right top)\n"
+      output = output + "G1 x%f y%f\n" % (wall.start_x_width + half_tool + offset_in_width, wall.start_y_height + half_tool + offset_in_height)
+
+    return output
+
+  def _generate_gcode_for_bottom_side(self, offset_in_width, offset_in_height, half_tool, tit_size):
+    wall = self.wall
+    output = ""
+    output = output + "(wall right bottom)\n"
+    output = output + "G1 x%f y%f\n" % (wall.start_x_width + half_tool + offset_in_width, wall.start_y - half_tool + offset_in_height)
+
+    if wall.wooden_joints.has_key('bottom'):
+      steps = wall.width / tit_size
+
+      for step_index in range(0, steps):
+        if step_index % 2 == 0:
+          output = output + "G1 x%f y%f\n" % (wall.start_x_width + half_tool - step_index * tit_size + offset_in_width, wall.start_y - half_tool)
+          output = output + "G1 x%f y%f\n" % (wall.start_x_width - half_tool - (step_index +1) * tit_size + offset_in_width, wall.start_y - half_tool)
+        else:
+          output = output + "G1 x%f y%f\n" % (wall.start_x_width - half_tool - step_index * tit_size + offset_in_width, wall.start_y - half_tool + offset_in_height)
+          output = output + "G1 x%f y%f\n" % (wall.start_x_width + half_tool - (step_index +1) * tit_size + offset_in_width, wall.start_y - half_tool + offset_in_height)
+
+    output = output + "(wall left bottom)\n"
+    output = output + "G1 x%f y%f\n" % (wall.start_x - half_tool + offset_in_width, wall.start_y - half_tool + offset_in_height)
+
+    return output
+
   def generate_gcode(self):
     half_tool = self.context.tool.cutter_diameter / 2
     wall = self.wall
@@ -144,25 +211,8 @@ class WallGcodeGenerator(ElementGcodeGenerator):
 
     output = ""
     output = output + self._generate_gcode_for_left_side(offset_in_width, offset_in_height, half_tool, tit_size)
+    output = output + self._generate_gcode_for_right_side(offset_in_width, offset_in_height, half_tool, tit_size)
 
-    output = output + "(wall right top)\n"
-    output = output + "G1 x%f y%f\n" % (wall.start_x_width + half_tool + offset_in_width, wall.start_y_height + half_tool + offset_in_height)
-
-    output = output + "(wall right bottom)\n"
-    output = output + "G1 x%f y%f\n" % (wall.start_x_width + half_tool + offset_in_width, wall.start_y - half_tool + offset_in_height)
-
-    if wall.wooden_joints.has_key('bottom'):
-      steps = wall.width / tit_size
-
-      for step_index in range(0, steps):
-        if step_index % 2 == 0:
-          output = output + "G1 x%f y%f\n" % (wall.start_x_width + half_tool - step_index * tit_size + offset_in_width, wall.start_y - half_tool)
-          output = output + "G1 x%f y%f\n" % (wall.start_x_width - half_tool - (step_index +1) * tit_size + offset_in_width, wall.start_y - half_tool)
-        else:
-          output = output + "G1 x%f y%f\n" % (wall.start_x_width - half_tool - step_index * tit_size + offset_in_width, wall.start_y - half_tool + offset_in_height)
-          output = output + "G1 x%f y%f\n" % (wall.start_x_width + half_tool - (step_index +1) * tit_size + offset_in_width, wall.start_y - half_tool + offset_in_height)
-
-    output = output + "(wall left bottom)\n"
-    output = output + "G1 x%f y%f\n" % (wall.start_x - half_tool + offset_in_width, wall.start_y - half_tool + offset_in_height)
+    output = output + self._generate_gcode_for_bottom_side(offset_in_width, offset_in_height, half_tool, tit_size)
 
     return output
