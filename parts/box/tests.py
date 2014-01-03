@@ -19,6 +19,8 @@ class BoxTest(unittest.TestCase):
 
     self.assertEquals(4, len(box.walls))
 
+  #def test_between_walls_it_should_move_out_of_material(self):
+
 class BoxWithWoodenJointsTest(unittest.TestCase):
   project = None
 

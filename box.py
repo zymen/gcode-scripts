@@ -4,12 +4,12 @@ from parts.box.box import BoxBuilder
 def main():
   project = Project()
   project.set_configuration(Configuration())
-  project.set_tool(Tool(cutter_diameter = 2))
+  project.set_tool(Tool(cutter_diameter = 4))
 
   box = BoxBuilder \
           .new_box(project) \
           .start_at(0, 0) \
-          .with_size(40, 60, 80) \
+          .with_size(50, 60, 80) \
           .with_wooden_joints() \
           .build()
 

@@ -31,6 +31,47 @@ class WallGcodeGeneratorSimpleTest(GcodeParserBaseTests):
     self.assertAreEqualGcodes(GcodeG1Command(x = 10, y = 0), parser.next_code())
     self.assertAreEqualGcodes(GcodeG1Command(x = 0, y = 0), parser.next_code())
 
+class WallGcodeGeneratorHeadAndFooterTest(GcodeParserBaseTests):
+    
+  def test_is_start_eq_end_simple_wall(self):
+    project = Project()
+    project.set_configuration(Configuration())
+
+    wall = WallBuilder \
+            .new_wall(project) \
+            .start_at(0, 0) \
+            .with_size(10, 10) \
+            .build()
+
+    gcode_generator = wall.get_gcode_generator()
+    output = gcode_generator.generate_gcode()
+
+    parser = GcodeParser(output)
+    first_code = parser.get_first_code()
+    last_code = parser.get_last_code()
+
+    self.assertAreEqualGcodes(first_code, last_code)
+
+  def test_is_start_eq_end_wall_with_joints(self):
+    project = Project()
+    project.set_configuration(Configuration())
+
+    wall = WallBuilder \
+            .new_wall(project) \
+            .start_at(0, 0) \
+            .with_wooden_joints(on_bottom = True) \
+            .with_size(10, 10) \
+            .build()
+
+    gcode_generator = wall.get_gcode_generator()
+    output = gcode_generator.generate_gcode()
+
+    parser = GcodeParser(output)
+    first_code = parser.get_first_code()
+    last_code = parser.get_last_code()
+
+    self.assertAreEqualGcodes(first_code, last_code)
+
 class WallGcodeGeneratorToolUsageTest(GcodeParserBaseTests):
   project = None
 
@@ -97,7 +138,7 @@ class WallGcodeGeneratorWithWoodenJointsTest(GcodeParserBaseTests):
     self.assertAreEqualGcodes(GcodeG1Command(x = 15, y = 5), parser.next_code())
     self.assertAreEqualGcodes(GcodeG1Command(x = 10, y = 5), parser.next_code())
 
-    #second tit
+    #third tit
     self.assertAreEqualGcodes(GcodeG1Command(x = 10, y = 0), parser.next_code())
     self.assertAreEqualGcodes(GcodeG1Command(x = 5, y = 0), parser.next_code())
     self.assertAreEqualGcodes(GcodeG1Command(x = 5, y = 5), parser.next_code())
@@ -115,8 +156,6 @@ class WallGcodeGeneratorWithWoodenJointsTest(GcodeParserBaseTests):
 
     gcode_generator = wall.get_gcode_generator()
     output = gcode_generator.generate_gcode()
-
-    print output
 
     parser = GcodeParser(output)
 
@@ -138,8 +177,8 @@ class WallGcodeGeneratorWithWoodenJointsTest(GcodeParserBaseTests):
     self.assertAreEqualGcodes(GcodeG1Command(x = 13, y = 3), parser.next_code())
     self.assertAreEqualGcodes(GcodeG1Command(x = 12, y = 3), parser.next_code())
 
-    #second tit
+    #third tit
     self.assertAreEqualGcodes(GcodeG1Command(x = 12, y = -2), parser.next_code())
     self.assertAreEqualGcodes(GcodeG1Command(x = 3, y = -2), parser.next_code())
     self.assertAreEqualGcodes(GcodeG1Command(x = 3, y = 3), parser.next_code())
-    self.assertAreEqualGcodes(GcodeG1Command(x = -2, y = 3), parser.next_code())
+    self.assertAreEqualGcodes(GcodeG1Command(x = 2, y = 3), parser.next_code())

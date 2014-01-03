@@ -116,6 +116,6 @@ class WallGcodeGenerator(ElementGcodeGenerator):
           output = output + "G1 x%f y%f\n" % (wall.start_x_width + half_tool - (step_index +1) * tit_size, wall.start_y - half_tool + offset_in_height)
 
     output = output + "(wall left bottom)\n"
-    output = output + "G1 x%f y%f\n" % (wall.start_x - half_tool, wall.start_y - half_tool)
+    output = output + "G1 x%f y%f\n" % (wall.start_x - half_tool, wall.start_y - half_tool + offset_in_height)
 
     return output
