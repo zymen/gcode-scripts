@@ -51,7 +51,7 @@ class BoxBuilder(object):
                 .new_wall(self.project) \
                 .start_at(index * 100, 50) \
                 .with_wooden_joints(on_left = True, on_right = True, on_top = False, on_bottom = True) \
-                .with_size(65, 40) \
+                .with_size(15, 20) \
                 .build()
 
       self.box.walls.append(wall)

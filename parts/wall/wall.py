@@ -94,20 +94,20 @@ class WallGcodeGenerator(ElementGcodeGenerator):
         if step_index % 2 == 0:
           #horizontal
           last_x = wall.start_x - half_tool
-          last_y = wall.start_y - half_tool + step_index * tit_size
+          last_y = wall.start_y - half_tool + step_index * tit_size + offset_in_height
           output = output + "G1 x%f y%f\n" % (last_x, last_y)
 
           last_x = wall.start_x - half_tool
-          last_y = wall.start_y + half_tool + (step_index + 1) * tit_size
+          last_y = wall.start_y + half_tool + (step_index + 1) * tit_size + offset_in_height
           output = output + "G1 x%f y%f\n" % (last_x, last_y)
         else:
           #vertical
           last_x = wall.start_x - half_tool + tit_size
-          last_y = wall.start_y + half_tool + step_index * tit_size
+          last_y = wall.start_y + half_tool + step_index * tit_size + offset_in_height
           output = output + "G1 x%f y%f\n" % (last_x, last_y)
 
           last_x = wall.start_x - half_tool + tit_size
-          last_y = wall.start_y - half_tool + (step_index + 1) * tit_size
+          last_y = wall.start_y - half_tool + (step_index + 1) * tit_size + offset_in_height
           output = output + "G1 x%f y%f\n" % (last_x, last_y)
 
       proposed_x = wall.start_x - half_tool + tit_size
@@ -146,23 +146,23 @@ class WallGcodeGenerator(ElementGcodeGenerator):
     output = output + self._generate_gcode_for_left_side(offset_in_width, offset_in_height, half_tool, tit_size)
 
     output = output + "(wall right top)\n"
-    output = output + "G1 x%f y%f\n" % (wall.start_x_width + half_tool, wall.start_y_height + half_tool + offset_in_height)
+    output = output + "G1 x%f y%f\n" % (wall.start_x_width + half_tool + offset_in_width, wall.start_y_height + half_tool + offset_in_height)
 
     output = output + "(wall right bottom)\n"
-    output = output + "G1 x%f y%f\n" % (wall.start_x_width + half_tool, wall.start_y - half_tool + offset_in_height)
+    output = output + "G1 x%f y%f\n" % (wall.start_x_width + half_tool + offset_in_width, wall.start_y - half_tool + offset_in_height)
 
     if wall.wooden_joints.has_key('bottom'):
       steps = wall.width / tit_size
 
       for step_index in range(0, steps):
         if step_index % 2 == 0:
-          output = output + "G1 x%f y%f\n" % (wall.start_x_width + half_tool - step_index * tit_size, wall.start_y - half_tool)
-          output = output + "G1 x%f y%f\n" % (wall.start_x_width - half_tool - (step_index +1) * tit_size, wall.start_y - half_tool)
+          output = output + "G1 x%f y%f\n" % (wall.start_x_width + half_tool - step_index * tit_size + offset_in_width, wall.start_y - half_tool)
+          output = output + "G1 x%f y%f\n" % (wall.start_x_width - half_tool - (step_index +1) * tit_size + offset_in_width, wall.start_y - half_tool)
         else:
-          output = output + "G1 x%f y%f\n" % (wall.start_x_width - half_tool - step_index * tit_size, wall.start_y - half_tool + offset_in_height)
-          output = output + "G1 x%f y%f\n" % (wall.start_x_width + half_tool - (step_index +1) * tit_size, wall.start_y - half_tool + offset_in_height)
+          output = output + "G1 x%f y%f\n" % (wall.start_x_width - half_tool - step_index * tit_size + offset_in_width, wall.start_y - half_tool + offset_in_height)
+          output = output + "G1 x%f y%f\n" % (wall.start_x_width + half_tool - (step_index +1) * tit_size + offset_in_width, wall.start_y - half_tool + offset_in_height)
 
     output = output + "(wall left bottom)\n"
-    output = output + "G1 x%f y%f\n" % (wall.start_x - half_tool, wall.start_y - half_tool + offset_in_height)
+    output = output + "G1 x%f y%f\n" % (wall.start_x - half_tool + offset_in_width, wall.start_y - half_tool + offset_in_height)
 
     return output
