@@ -58,3 +58,96 @@ class GcodeParserSimpleUsageTests(GcodeParserBaseTests):
     code = parser.next_code(ignore_comments = False)
     self.assertAreEqualGcodes(code, GcodeG1Command(x = -3, y = 0.0001, z = 2))
 
+  def test_get_first_gcode(self):
+    gcode = """
+    (test)
+    G1 X0 Y0
+    (test 2)
+    G1 Z2.000 X-3 Y0.0001
+    G1 Z15
+    G1 X0 Y0
+    """
+
+    parser = GcodeParser(gcode)
+
+    first_code = parser.get_first_code()
+    self.assertTrue(isinstance(first_code, GcodeG1Command)) 
+    self.assertAreEqualGcodes(GcodeG1Command(x = 0, y = 0), first_code)
+
+  def test_get_first_gcode_with_next_code_before_usage(self):
+    gcode = """
+    (test)
+    G1 X0 Y0
+    (test 2)
+    G1 Z2.000 X-3 Y0.0001
+    G1 Z15
+    G1 X0 Y0
+    """
+
+    parser = GcodeParser(gcode)
+    parser.next_code()
+    parser.next_code()
+
+    first_code = parser.get_first_code()
+    self.assertTrue(isinstance(first_code, GcodeG1Command)) 
+    self.assertAreEqualGcodes(GcodeG1Command(x = 0, y = 0), first_code)
+
+  def test_get_first_gcode_with_next_code_before_and_after_usage(self):
+    gcode = """
+    (test)
+    G1 X0 Y0
+    (test 2)
+    G1 Z15
+    G1 Z2.000 X-3 Y0.0001
+    G1 X0 Y0
+    """
+
+    parser = GcodeParser(gcode)
+    parser.next_code()
+    parser.next_code()
+
+    first_code = parser.get_first_code()
+    self.assertTrue(isinstance(first_code, GcodeG1Command)) 
+    self.assertAreEqualGcodes(GcodeG1Command(x = 0, y = 0), first_code)
+
+    code = parser.next_code()
+    self.assertTrue(isinstance(code, GcodeG1Command)) 
+    self.assertAreEqualGcodes(GcodeG1Command(z = 2, x = -3, y = 0.0001), code)
+
+  def test_get_last_gcode(self):
+    gcode = """
+    (test)
+    G1 X0 Y0
+    (test 2)
+    G1 Z2.000 X-3 Y0.0001
+    G1 Z15
+    G1 X1 Y0
+    """
+
+    parser = GcodeParser(gcode)
+
+    last_code = parser.get_last_code()
+    self.assertTrue(isinstance(last_code, GcodeG1Command)) 
+    self.assertAreEqualGcodes(GcodeG1Command(x = 1, y = 0), last_code)
+
+  def test_get_first_gcode_with_next_code_before_and_after_usage(self):
+    gcode = """
+    (test)
+    G1 X0 Y0
+    (test 2)
+    G1 Z15
+    G1 Z2.000 X-3 Y0.0001
+    G1 X1 Y0
+    """
+
+    parser = GcodeParser(gcode)
+    parser.next_code()
+    parser.next_code()
+
+    last_code = parser.get_last_code()
+    self.assertTrue(isinstance(last_code, GcodeG1Command)) 
+    self.assertAreEqualGcodes(GcodeG1Command(x = 1, y = 0), last_code)
+
+    code = parser.next_code()
+    self.assertTrue(isinstance(code, GcodeG1Command)) 
+    self.assertAreEqualGcodes(GcodeG1Command(z = 2, x = -3, y = 0.0001), code)

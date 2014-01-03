@@ -36,6 +36,26 @@ class GcodeParser(object):
 
     return command
 
+  def _get_code_on_position(self, position, ignore_comments = True):
+    command = None
+
+    saved_gcode_pointer = self._gcode_pointer
+    self._gcode_pointer = position
+
+    command = self.next_code(ignore_comments = ignore_comments)
+
+    self._gcode_pointer = saved_gcode_pointer
+
+    return command
+
+  def get_first_code(self, ignore_comments = True):
+    position = 0
+    return self._get_code_on_position(position)
+
+  def get_last_code(self, ignore_comments = True):
+    position = len(self.gcode) - 1
+    return self._get_code_on_position(position)
+
   def find(self, searched_command):
     for index in range(0, len(self.gcode)):
       entry = self._prepare_gcode_command(self.gcode[index])
