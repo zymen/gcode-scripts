@@ -4,7 +4,7 @@ from parts.box.box import BoxBuilder
 def main():
   project = Project()
   project.set_configuration(Configuration())
-  project.set_tool(Tool(cutter_diameter = 4))
+#  project.set_tool(Tool(cutter_diameter = 4))
 
   box = BoxBuilder \
           .new_box(project) \
