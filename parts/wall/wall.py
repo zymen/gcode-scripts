@@ -137,23 +137,23 @@ class WallGcodeGenerator(ElementGcodeGenerator):
       last_x = 0
       last_y = 0
 
+      condition_equality = steps % 2
+
       for step_index in range(steps, 0, -1):
-        if step_index % 2 == 0:
-          #horizontal
-          last_x = wall.start_x_width + half_tool + tit_size
+        if step_index % 2 == condition_equality:
+          last_x = wall.start_x_width + half_tool + tit_size + offset_in_width
           last_y = wall.start_y + half_tool + (step_index + 0) * tit_size + offset_in_height
           output = output + "G1 x%f y%f\n" % (last_x, last_y)
 
-          last_x = wall.start_x_width + half_tool + tit_size
+          last_x = wall.start_x_width + half_tool + tit_size + offset_in_width
           last_y = wall.start_y - half_tool + (step_index - 1) * tit_size + offset_in_height
           output = output + "G1 x%f y%f\n" % (last_x, last_y)
         else:
-          #vertical
-          last_x = wall.start_x_width + half_tool
+          last_x = wall.start_x_width + half_tool + offset_in_width
           last_y = wall.start_y - half_tool + (step_index + 0)* tit_size + offset_in_height
           output = output + "G1 x%f y%f\n" % (last_x, last_y)
 
-          last_x = wall.start_x_width + half_tool
+          last_x = wall.start_x_width + half_tool + offset_in_width
           last_y = wall.start_y + half_tool + (step_index - 1) * tit_size + offset_in_height
           output = output + "G1 x%f y%f\n" % (last_x, last_y)
 
@@ -203,9 +203,6 @@ class WallGcodeGenerator(ElementGcodeGenerator):
 
     if wall.wooden_joints.has_key('left'):
       offset_in_width = offset_in_width + tit_size
-
-    if wall.wooden_joints.has_key('top'):
-      offset_in_height = offset_in_height + tit_size
 
     if wall.wooden_joints.has_key('bottom'):
       offset_in_height = offset_in_height + tit_size
