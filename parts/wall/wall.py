@@ -140,28 +140,29 @@ class WallGcodeGenerator(ElementGcodeGenerator):
       for step_index in range(steps, 0, -1):
         if step_index % 2 == 0:
           #horizontal
-          last_x = wall.start_x_width - half_tool + tit_size
-          last_y = wall.start_y - half_tool + (step_index + 0) * tit_size + offset_in_height
+          last_x = wall.start_x_width + half_tool + tit_size
+          last_y = wall.start_y + half_tool + (step_index + 0) * tit_size + offset_in_height
           output = output + "G1 x%f y%f\n" % (last_x, last_y)
 
-          last_x = wall.start_x_width - half_tool + tit_size
-          last_y = wall.start_y + half_tool + (step_index - 1) * tit_size + offset_in_height
+          last_x = wall.start_x_width + half_tool + tit_size
+          last_y = wall.start_y - half_tool + (step_index - 1) * tit_size + offset_in_height
           output = output + "G1 x%f y%f\n" % (last_x, last_y)
         else:
           #vertical
-          last_x = wall.start_x_width - half_tool
-          last_y = wall.start_y + half_tool + (step_index + 0)* tit_size + offset_in_height
+          last_x = wall.start_x_width + half_tool
+          last_y = wall.start_y - half_tool + (step_index + 0)* tit_size + offset_in_height
           output = output + "G1 x%f y%f\n" % (last_x, last_y)
 
-          last_x = wall.start_x_width - half_tool
-          last_y = wall.start_y - half_tool + (step_index - 1) * tit_size + offset_in_height
+          last_x = wall.start_x_width + half_tool
+          last_y = wall.start_y + half_tool + (step_index - 1) * tit_size + offset_in_height
           output = output + "G1 x%f y%f\n" % (last_x, last_y)
 
       proposed_x = wall.start_x_width - half_tool + tit_size
       proposed_y = wall.start_y_height + half_tool + offset_in_height
 
       if last_x != proposed_x or last_y != proposed_y:
-        output = output + "(wall right top)\n"
+        pass
+        #output = output + "(wall right top)\n"
         #output = output + "G1 x%f y%f\n" % (proposed_x, proposed_y)
 
     else:

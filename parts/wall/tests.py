@@ -299,11 +299,11 @@ class WallGcodeGeneratorWithWoodenJointsRightSideTest(GcodeParserBaseTests):
 
   def test_is_output_for_right_side_with_non_zero_tool_length_correct(self):
     self.project.set_tool(Tool(cutter_diameter = 4))
-    '''
+    
     wall = WallBuilder \
             .new_wall(self.project) \
             .start_at(0, 0) \
-            .with_size(10, 30) \
+            .with_size(10, 20) \
             .with_wooden_joints(on_right = True) \
             .build()
 
@@ -312,26 +312,22 @@ class WallGcodeGeneratorWithWoodenJointsRightSideTest(GcodeParserBaseTests):
 
     parser = GcodeParser(output)
 
-    self.assertAreEqualGcodes(GcodeG1Command(x = 5, y = -2), parser.next_code())
+    self.assertAreEqualGcodes(GcodeG1Command(x = -2, y = -2), parser.next_code())
+
+    self.assertAreEqualGcodes(GcodeG1Command(x = -2, y = 22), parser.next_code())
+    self.assertAreEqualGcodes(GcodeG1Command(x = 17, y = 22), parser.next_code())
+    self.assertAreEqualGcodes(GcodeG1Command(x = 17, y = 13), parser.next_code())
+    self.assertAreEqualGcodes(GcodeG1Command(x = 12, y = 13), parser.next_code())
+
+    self.assertAreEqualGcodes(GcodeG1Command(x = 12, y = 12), parser.next_code())
+    self.assertAreEqualGcodes(GcodeG1Command(x = 17, y = 12), parser.next_code())
+    self.assertAreEqualGcodes(GcodeG1Command(x = 17, y = 3), parser.next_code())
+    self.assertAreEqualGcodes(GcodeG1Command(x = 12, y = 3), parser.next_code())
+
+    self.assertAreEqualGcodes(GcodeG1Command(x = 12, y = 2), parser.next_code())
+    self.assertAreEqualGcodes(GcodeG1Command(x = 12, y = -2), parser.next_code())
 
     self.assertAreEqualGcodes(GcodeG1Command(x = -2, y = -2), parser.next_code())
-    self.assertAreEqualGcodes(GcodeG1Command(x = -2, y = 7), parser.next_code())
-    self.assertAreEqualGcodes(GcodeG1Command(x = 3, y = 7), parser.next_code())
-    self.assertAreEqualGcodes(GcodeG1Command(x = 3, y = 8), parser.next_code())
-
-    self.assertAreEqualGcodes(GcodeG1Command(x = -2, y = 8), parser.next_code())
-    self.assertAreEqualGcodes(GcodeG1Command(x = -2, y = 17), parser.next_code())
-    self.assertAreEqualGcodes(GcodeG1Command(x = 3, y = 17), parser.next_code())
-    self.assertAreEqualGcodes(GcodeG1Command(x = 3, y = 18), parser.next_code())
-
-    self.assertAreEqualGcodes(GcodeG1Command(x = -2, y = 18), parser.next_code())
-    self.assertAreEqualGcodes(GcodeG1Command(x = -2, y = 27), parser.next_code())
-    self.assertAreEqualGcodes(GcodeG1Command(x = 3, y = 27), parser.next_code())
-    self.assertAreEqualGcodes(GcodeG1Command(x = 3, y = 28), parser.next_code())
-
-    self.assertAreEqualGcodes(GcodeG1Command(x = 3, y = 32), parser.next_code())
-    self.assertAreEqualGcodes(GcodeG1Command(x = 17, y = 32), parser.next_code())
-    '''
 
 class WallGcodeGeneratorWithWoodenJointsTogetherTest(GcodeParserBaseTests):
   project = None
